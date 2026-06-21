@@ -41,18 +41,17 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # Middleware MUST be inside this function
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
-            "https://ai-study-buddy-h0rehpzdb-azeem-ahmad.vercel.app", 
+            "https://ai-study-buddy-jet.vercel.app",  # YOUR ACTUAL NEW URL
+            "https://ai-study-buddy-h0rehpzdb-azeem-ahmad.vercel.app", # The old one
             "http://localhost:3000"
         ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(
         request: Request,
