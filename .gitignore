@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.env
+study_buddy.db
+
+# Node
+node_modules/
+.next/
+dist/
+build/
+.env.local
+.DS_Store
