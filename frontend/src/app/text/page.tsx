@@ -33,26 +33,22 @@ interface QuizQuestion {
 
 // --- HELPER COMPONENTS ---
 
-// 1. Native Markdown Parser for the Summary
 const FormattedSummary = ({ text }: { text: string }) => {
   if (!text) return <p>No summary available.</p>;
 
   return (
-    <div className="space-y-3 text-gray-300 leading-relaxed">
+    <div className="space-y-3 text-gray-300 leading-relaxed text-sm md:text-base">
       {text.split('\n').map((line, i) => {
         const trimmed = line.trim();
         if (!trimmed) return <br key={i} />;
         
-        // Headers
-        if (trimmed.startsWith('### ')) return <h3 key={i} className="text-lg font-bold mt-4 text-[#00f3ff]">{trimmed.replace('### ', '')}</h3>;
-        if (trimmed.startsWith('## ')) return <h2 key={i} className="text-xl font-bold mt-6 mb-2 text-[#00f3ff] border-b border-white/10 pb-2">{trimmed.replace('## ', '')}</h2>;
-        if (trimmed.startsWith('# ')) return <h1 key={i} className="text-2xl font-bold mt-6 mb-4 text-[#00f3ff]">{trimmed.replace('# ', '')}</h1>;
+        if (trimmed.startsWith('### ')) return <h3 key={i} className="text-base md:text-lg font-bold mt-4 text-[#00f3ff]">{trimmed.replace('### ', '')}</h3>;
+        if (trimmed.startsWith('## ')) return <h2 key={i} className="text-lg md:text-xl font-bold mt-6 mb-2 text-[#00f3ff] border-b border-white/10 pb-2">{trimmed.replace('## ', '')}</h2>;
+        if (trimmed.startsWith('# ')) return <h1 key={i} className="text-xl md:text-2xl font-bold mt-6 mb-4 text-[#00f3ff]">{trimmed.replace('# ', '')}</h1>;
         
-        // Lists
         const isListItem = trimmed.startsWith('* ') || trimmed.startsWith('- ');
         const content = isListItem ? trimmed.substring(2) : trimmed;
         
-        // Bold Text Parser
         const parts = content.split(/(\*\*.*?\*\*)/);
         const formattedContent = parts.map((part, j) => 
           part.startsWith('**') && part.endsWith('**') 
@@ -60,14 +56,13 @@ const FormattedSummary = ({ text }: { text: string }) => {
             : part
         );
 
-        if (isListItem) return <li key={i} className="ml-6 list-disc my-1">{formattedContent}</li>;
+        if (isListItem) return <li key={i} className="ml-4 md:ml-6 list-disc my-1">{formattedContent}</li>;
         return <p key={i}>{formattedContent}</p>;
       })}
     </div>
   );
 };
 
-// 2. Interactive Flashcard Component
 const InteractiveFlashcard = ({ card, index }: { card: Flashcard, index: number }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const frontText = card.front || card.question || "Front missing";
@@ -76,49 +71,46 @@ const InteractiveFlashcard = ({ card, index }: { card: Flashcard, index: number 
   return (
     <div 
       onClick={() => setIsFlipped(!isFlipped)}
-      className="relative w-full h-48 cursor-pointer perspective-1000 group"
+      className="relative w-full h-48 md:h-56 cursor-pointer perspective-1000 group"
       style={{ perspective: '1000px' }}
     >
       <div 
         className={`w-full h-full transition-transform duration-500 preserve-3d relative ${isFlipped ? 'rotate-y-180' : ''}`}
         style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
       >
-        {/* Front */}
-        <div className="absolute w-full h-full backface-hidden bg-[#121212] border border-white/10 rounded-xl p-6 flex flex-col items-center justify-center text-center shadow-lg hover:border-[#00f3ff]/50 transition-colors" style={{ backfaceVisibility: 'hidden' }}>
+        <div className="absolute w-full h-full backface-hidden bg-[#121212] border border-white/10 rounded-xl p-4 md:p-6 flex flex-col items-center justify-center text-center shadow-lg hover:border-[#00f3ff]/50 transition-colors" style={{ backfaceVisibility: 'hidden' }}>
           <span className="absolute top-3 left-4 text-[10px] text-[#00f3ff] uppercase tracking-widest font-mono">Card {index + 1}</span>
-          <h3 className="text-lg font-medium text-gray-100">{frontText}</h3>
-          <span className="absolute bottom-3 text-xs text-gray-500 italic">Click to flip</span>
+          <h3 className="text-base md:text-lg font-medium text-gray-100">{frontText}</h3>
+          <span className="absolute bottom-3 text-[10px] md:text-xs text-gray-500 italic">Tap to flip</span>
         </div>
         
-        {/* Back */}
-        <div className="absolute w-full h-full backface-hidden bg-[#1a1a2e] border border-purple-500/30 rounded-xl p-6 flex flex-col items-center justify-center text-center shadow-lg overflow-y-auto" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-          <p className="text-sm text-gray-200 leading-relaxed">{backText}</p>
+        <div className="absolute w-full h-full backface-hidden bg-[#1a1a2e] border border-purple-500/30 rounded-xl p-4 md:p-6 flex flex-col items-center justify-center text-center shadow-lg overflow-y-auto" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+          <p className="text-xs md:text-sm text-gray-200 leading-relaxed">{backText}</p>
         </div>
       </div>
     </div>
   );
 };
 
-// 3. Interactive Quiz Component
 const InteractiveQuizItem = ({ q, index }: { q: QuizQuestion, index: number }) => {
   const [selectedOpt, setSelectedOpt] = useState<string | null>(null);
   const correctAnswer = q.correct_answer || q.correctAnswer || "";
   const questionText = q.question_text || q.question || "Question missing";
 
   return (
-    <div className="p-6 bg-[#121212] border border-white/10 rounded-xl shadow-lg">
+    <div className="p-4 md:p-6 bg-[#121212] border border-white/10 rounded-xl shadow-lg">
       <div className="flex items-start gap-3 mb-4">
-        <span className="shrink-0 text-xs bg-[#00f3ff]/10 text-[#00f3ff] px-2.5 py-1 rounded-full font-mono font-bold mt-0.5">Q-{index + 1}</span>
-        <p className="font-medium text-lg text-gray-100">{questionText}</p>
+        <span className="shrink-0 text-[10px] md:text-xs bg-[#00f3ff]/10 text-[#00f3ff] px-2.5 py-1 rounded-full font-mono font-bold mt-0.5">Q-{index + 1}</span>
+        <p className="font-medium text-base md:text-lg text-gray-100">{questionText}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3 mb-4">
         {(q.options || []).map((opt, i) => {
           const isSelected = selectedOpt === opt;
           const isCorrect = opt === correctAnswer;
           const hasAnswered = selectedOpt !== null;
           
-          let btnClass = "p-3 rounded-lg text-sm text-left border transition-all duration-200 ";
+          let btnClass = "p-3 rounded-lg text-xs md:text-sm text-left border transition-all duration-200 w-full ";
           
           if (!hasAnswered) {
             btnClass += "bg-[#1a1a1a] border-white/5 hover:border-[#00f3ff]/50 hover:bg-white/5 cursor-pointer text-gray-300";
@@ -130,12 +122,7 @@ const InteractiveQuizItem = ({ q, index }: { q: QuizQuestion, index: number }) =
           }
 
           return (
-            <button 
-              key={i} 
-              disabled={hasAnswered}
-              onClick={() => setSelectedOpt(opt)}
-              className={btnClass}
-            >
+            <button key={i} disabled={hasAnswered} onClick={() => setSelectedOpt(opt)} className={btnClass}>
               {opt}
             </button>
           );
@@ -144,8 +131,8 @@ const InteractiveQuizItem = ({ q, index }: { q: QuizQuestion, index: number }) =
 
       {selectedOpt && (
         <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className={`p-4 rounded-lg border-l-4 ${selectedOpt === correctAnswer ? 'bg-green-500/10 border-green-500' : 'bg-red-500/10 border-red-500'}`}>
-            <p className="text-sm text-gray-300">
+          <div className={`p-3 md:p-4 rounded-lg border-l-4 ${selectedOpt === correctAnswer ? 'bg-green-500/10 border-green-500' : 'bg-red-500/10 border-red-500'}`}>
+            <p className="text-xs md:text-sm text-gray-300">
               <span className="font-bold text-white block mb-1">Explanation:</span>
               {q.explanation}
             </p>
@@ -156,7 +143,6 @@ const InteractiveQuizItem = ({ q, index }: { q: QuizQuestion, index: number }) =
   );
 };
 
-// --- MAIN PAGE ---
 export default function TextAnalytics() {
   const [activeTab, setActiveTab] = useState("summary");
   const [inputText, setInputText] = useState("");
@@ -192,7 +178,6 @@ export default function TextAnalytics() {
     if (selectedFile) formData.append("file", selectedFile);
     formData.append("model", selectedModel);
 
-    // FIX: Grab the URL and scrub any accidental trailing slashes
     const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://ai-study-buddy-vkty.onrender.com";
     const API_BASE_URL = rawUrl.replace(/\/$/, "");
 
@@ -229,43 +214,51 @@ export default function TextAnalytics() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto text-white">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 tracking-tight">Text Analytics Engine</h1>
-        <p className="text-gray-400">Process documents into structured, interactive study guides.</p>
+    <div className="p-4 md:p-8 max-w-6xl mx-auto text-white">
+      {/* Header */}
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2 tracking-tight">Text Analytics Engine</h1>
+        <p className="text-sm md:text-base text-gray-400">Process documents into structured, interactive study guides.</p>
       </div>
 
-      <div className="mb-10 bg-[#121212] border border-white/5 rounded-xl p-5 shadow-2xl focus-within:border-[#00f3ff]/50 transition-colors">
-        <div className="mb-4 border-b border-white/10 pb-5">
+      {/* Input Engine */}
+      <div className="mb-8 md:mb-10 bg-[#121212] border border-white/5 rounded-xl p-4 md:p-5 shadow-2xl focus-within:border-[#00f3ff]/50 transition-colors">
+        
+        {/* File Upload Row - Mobile Responsive Stack */}
+        <div className="mb-4 border-b border-white/10 pb-4 md:pb-5">
           <input type="file" ref={fileInputRef} className="hidden" accept=".pdf,image/png,image/jpeg,image/webp" onChange={handleFileChange} />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/5 rounded-lg text-[#00f3ff]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="p-2 bg-white/5 rounded-lg text-[#00f3ff] shrink-0">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
               </div>
-              <span className="text-sm font-medium text-gray-300">{selectedFile ? selectedFile.name : "Attach Syllabus / PDF / Image"}</span>
+              <span className="text-xs md:text-sm font-medium text-gray-300 truncate w-full">
+                {selectedFile ? selectedFile.name : "Attach Syllabus / PDF / Image"}
+              </span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               {selectedFile && (
-                <button onClick={() => setSelectedFile(null)} className="px-4 py-2 text-xs font-semibold text-red-400 bg-red-400/10 hover:bg-red-400/20 rounded-lg transition-colors">Remove</button>
+                <button onClick={() => setSelectedFile(null)} className="flex-1 sm:flex-none px-4 py-2 text-xs font-semibold text-red-400 bg-red-400/10 hover:bg-red-400/20 rounded-lg transition-colors">Remove</button>
               )}
-              <button onClick={() => fileInputRef.current?.click()} className="px-5 py-2 text-xs font-semibold bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">Browse</button>
+              <button onClick={() => fileInputRef.current?.click()} className="flex-1 sm:flex-none px-5 py-2 text-xs font-semibold bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">Browse</button>
             </div>
           </div>
         </div>
 
+        {/* Text Area */}
         <textarea
-          className="w-full h-32 bg-transparent text-gray-200 focus:outline-none resize-none placeholder-gray-600 text-sm leading-relaxed"
+          className="w-full h-24 md:h-32 bg-transparent text-gray-200 focus:outline-none resize-none placeholder-gray-600 text-xs md:text-sm leading-relaxed"
           placeholder="...or paste your raw text, lecture notes, or code blocks here."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
         />
         
-        <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap justify-between items-center gap-4">
+        {/* Actions Row - Mobile Responsive Stack */}
+        <div className="mt-4 pt-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 md:gap-4">
           <select 
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
-            className="bg-black/50 border border-white/10 text-gray-300 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#00f3ff] transition-colors cursor-pointer outline-none"
+            className="w-full sm:w-auto bg-black/50 border border-white/10 text-gray-300 text-xs md:text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#00f3ff] transition-colors cursor-pointer outline-none"
           >
             <option value="gemini-2.5-flash">Gemini 2.5 Flash (Next-Gen Speed)</option>
             <option value="gemini-1.5-flash-8b-001">Gemini 1.5 Flash-8B (Ultra Fast)</option>
@@ -274,7 +267,7 @@ export default function TextAnalytics() {
           <button 
             onClick={handleAnalyze}
             disabled={isProcessing}
-            className={`px-8 py-2.5 font-bold text-sm rounded-lg transition-all ${
+            className={`w-full sm:w-auto px-8 py-2.5 font-bold text-xs md:text-sm rounded-lg transition-all ${
               isProcessing 
                 ? "bg-gray-800 text-gray-500 cursor-not-allowed" 
                 : "bg-[#00f3ff] text-black hover:bg-[#00f3ff]/80 hover:shadow-[0_0_20px_rgba(0,243,255,0.4)]"
@@ -285,13 +278,13 @@ export default function TextAnalytics() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-6 border-b border-white/10 mb-8 px-2">
+      {/* Swipeable Tabs for Mobile */}
+      <div className="flex gap-4 md:gap-6 border-b border-white/10 mb-6 md:mb-8 px-1 md:px-2 overflow-x-auto whitespace-nowrap scrollbar-hide pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {["summary", "flashcards", "quiz"].map((tab) => (
           <button 
             key={tab}
             onClick={() => setActiveTab(tab)} 
-            className={`pb-3 text-sm font-semibold capitalize tracking-wide transition-all ${activeTab === tab ? "border-b-2 border-[#00f3ff] text-[#00f3ff]" : "text-gray-500 hover:text-gray-300"}`}
+            className={`pb-3 text-xs md:text-sm font-semibold capitalize tracking-wide transition-all ${activeTab === tab ? "border-b-2 border-[#00f3ff] text-[#00f3ff]" : "text-gray-500 hover:text-gray-300"}`}
           >
             {tab === "quiz" ? "Quiz Runner" : tab}
           </button>
@@ -301,10 +294,10 @@ export default function TextAnalytics() {
       {/* Viewport */}
       <div className="min-h-[400px]">
         {isProcessing && (
-          <div className="flex flex-col items-center justify-center h-64 text-gray-500 animate-in fade-in duration-500">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#00f3ff] mb-6"></div>
-            <p className="font-medium tracking-wide">Building your study guide...</p>
-            <p className="text-xs mt-2 opacity-50">Tokenizing input material.</p>
+          <div className="flex flex-col items-center justify-center h-48 md:h-64 text-gray-500 animate-in fade-in duration-500">
+            <div className="animate-spin rounded-full h-8 w-8 md:h-10 md:w-10 border-t-2 border-b-2 border-[#00f3ff] mb-4 md:mb-6"></div>
+            <p className="text-sm md:text-base font-medium tracking-wide">Building your study guide...</p>
+            <p className="text-[10px] md:text-xs mt-2 opacity-50">Tokenizing input material.</p>
           </div>
         )}
 
@@ -312,12 +305,12 @@ export default function TextAnalytics() {
         {!isProcessing && activeTab === "summary" && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {summaryResult ? (
-              <div className="bg-[#121212] border border-white/5 rounded-xl p-8 shadow-xl">
+              <div className="bg-[#121212] border border-white/5 rounded-xl p-4 md:p-8 shadow-xl overflow-hidden">
                 <FormattedSummary text={summaryResult.study_guide || summaryResult.executiveSummary || summaryResult.summary || summaryResult.text || summaryResult.content || ""} />
               </div>
             ) : (
-              <div className="h-64 flex items-center justify-center border border-dashed border-white/10 rounded-xl bg-white/[0.02]">
-                <p className="text-gray-500 font-medium">No document analyzed yet. Submit content above.</p>
+              <div className="h-48 md:h-64 flex items-center justify-center border border-dashed border-white/10 rounded-xl bg-white/[0.02]">
+                <p className="text-xs md:text-sm text-gray-500 font-medium px-4 text-center">No document analyzed yet. Submit content above.</p>
               </div>
             )}
           </div>
@@ -327,14 +320,14 @@ export default function TextAnalytics() {
         {!isProcessing && activeTab === "flashcards" && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {flashcardsResult && flashcardsResult.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {flashcardsResult.map((card, index) => (
                   <InteractiveFlashcard key={index} card={card} index={index} />
                 ))}
               </div>
             ) : (
-               <div className="h-64 flex items-center justify-center border border-dashed border-white/10 rounded-xl bg-white/[0.02]">
-                <p className="text-gray-500 font-medium">No flashcards compiled yet.</p>
+               <div className="h-48 md:h-64 flex items-center justify-center border border-dashed border-white/10 rounded-xl bg-white/[0.02]">
+                <p className="text-xs md:text-sm text-gray-500 font-medium">No flashcards compiled yet.</p>
               </div>
             )}
           </div>
@@ -344,14 +337,14 @@ export default function TextAnalytics() {
         {!isProcessing && activeTab === "quiz" && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {quizResult && quizResult.length > 0 ? (
-              <div className="space-y-6 max-w-4xl mx-auto">
+              <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto">
                 {quizResult.map((q, index) => (
                   <InteractiveQuizItem key={index} q={q} index={index} />
                 ))}
               </div>
             ) : (
-               <div className="h-64 flex items-center justify-center border border-dashed border-white/10 rounded-xl bg-white/[0.02]">
-                <p className="text-gray-500 font-medium">No evaluation questions generated yet.</p>
+               <div className="h-48 md:h-64 flex items-center justify-center border border-dashed border-white/10 rounded-xl bg-white/[0.02]">
+                <p className="text-xs md:text-sm text-gray-500 font-medium">No evaluation questions generated yet.</p>
               </div>
             )}
           </div>
