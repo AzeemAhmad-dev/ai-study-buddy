@@ -196,9 +196,9 @@ export default function TextAnalytics() {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://ai-study-buddy-vkty.onrender.com";
 
     const endpointMap: Record<string, string> = {
-      summary: `${API_BASE_URL}/api/text/summarize`,
-      flashcards: `${API_BASE_URL}/api/text/flashcards`,
-      quiz: `${API_BASE_URL}/api/text/quiz`
+      summary: `${API_BASE_URL}/summarize`,
+      flashcards: `${API_BASE_URL}/flashcards`,
+      quiz: `${API_BASE_URL}/quiz`
     };
 
     try {
