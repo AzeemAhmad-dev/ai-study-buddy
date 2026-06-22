@@ -192,8 +192,9 @@ export default function TextAnalytics() {
     if (selectedFile) formData.append("file", selectedFile);
     formData.append("model", selectedModel);
 
-    // FIX: Using the base URL from environment variables, explicitly bypassing relative paths
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://ai-study-buddy-vkty.onrender.com";
+    // FIX: Grab the URL and scrub any accidental trailing slashes
+    const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://ai-study-buddy-vkty.onrender.com";
+    const API_BASE_URL = rawUrl.replace(/\/$/, "");
 
     const endpointMap: Record<string, string> = {
       summary: `${API_BASE_URL}/api/text/summarize`,
